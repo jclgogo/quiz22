@@ -28,7 +28,7 @@
 {"type":"judge","id":"28","question":"Excel 图表的数据可视化功能只能用于静态展示数据，无法进行动态交互。","options":["A. 正确","B. 错误"],"answer":"B","explanation":"Excel 图表的数据可视化功能不仅可以用于静态展示数据，还可以通过添加交互元素（如筛选器、切片器等）来实现动态交互。"}
 {"type":"judge","id":"29","question":"工作簿的扩展名是.xls。","options":["A. 正确","B. 错误"],"answer":"B","explanation":"在 Excel 2007 及更高版本中，工作簿的扩展名是.xlsx。而.xls 是 Excel 2003 及更早版本的工作簿扩展名。"}
 {"type":"judge","id":"30","question":"通过利用 Excel 宏，我们可以将繁琐的重复性任务自动化，使我们的工作变得高效和轻松。","options":["A. 正确","B. 错误"],"answer":"A","explanation":"Excel 宏是一种自动化工具，可以帮助用户完成繁琐的重复性任务。"}
-{"type":"judge","id":"31","question":"用人单位与劳动者订立的劳动合同中，约定了试用期满后自动转正的条款，这样的约定是合法的。","options":["A. 正确","B. 错误"],"answer":"B","explanation":""}
+{"type":"judge","id":"31","question":"用人单位与劳动者订立的劳动合同中，约定了试用期满后自动转正的条款，这样的约定是合法的。","options":["A. 正确","B. 错误"],"answer":"A","explanation":"这题注意一下，之前答案选错误说是有问题"}
 {"type":"judge","id":"32","question":"劳动合同中必须包含劳动合同期限。","options":["A. 正确","B. 错误"],"answer":"A","explanation":"劳动合同期限是劳动合同的必备条款之一，必须明确约定。"}
 {"type":"judge","id":"33","question":"劳动者在试用期内可以随时解除劳动合同。","options":["A. 正确","B. 错误"],"answer":"B","explanation":"虽然劳动者在试用期内享有解除劳动合同的权利，但通常需要提前通知用人单位，并遵守相关法律法规的规定。"}
 {"type":"judge","id":"34","question":"网络运营者应当采取技术措施和其他必要措施，确保其收集的个人信息安全，防止信息泄露、损毁、丢失。","options":["A. 正确","B. 错误"],"answer":"A","explanation":"这是网络安全法等相关法律法规对网络运营者的基本要求。"}
