@@ -25,35 +25,113 @@
                     <label><input type="checkbox" name="type-filter" value="single" checked> 单选题</label>
                     <label><input type="checkbox" name="type-filter" value="multi" checked> 多选题</label>
                 </div>
+                <div class="control-group">
+                    <button id="profile-link" class="btn btn-secondary btn-compact">个人信息</button>
+                </div>
             </div>
         </header>
 
-        <main id="quiz-area">
-            <div id="question" class="question-card">
-                <!-- 题目渲染在这里 -->
-                <p>正在加载题库...</p>
-            </div>
-
-            <div id="options" class="options-group">
-                <!-- 选项渲染在这里 -->
-            </div>
-
-            <div class="action-bar">
-                <button id="submit" class="btn btn-primary">提交答案</button>
-                <button id="next-btn" class="btn btn-success" style="display: none;">下一题</button>
-            </div>
-
-            <div id="feedback" class="feedback-area">
-                <div id="result"></div>
-                <div id="explanation"></div>
-                <div id="stats"></div>
-                
-                <div id="note-area" style="display: none;">
-                    <h4>学习笔记：</h4>
-                    <textarea id="note-text" placeholder="在这里输入你的笔记..."></textarea>
-                    <button id="save-note" class="btn btn-secondary">保存笔记</button>
+        <main class="layout">
+            <aside class="sidebar" id="question-nav">
+                <div class="nav-section">
+                    <div class="nav-title">判断题</div>
+                    <div class="nav-grid" id="nav-judge"></div>
                 </div>
-            </div>
+                <div class="nav-section">
+                    <div class="nav-title">单选题</div>
+                    <div class="nav-grid" id="nav-single"></div>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-title">多选题</div>
+                    <div class="nav-grid" id="nav-multi"></div>
+                </div>
+            </aside>
+
+            <section class="content">
+                <div id="quiz-view">
+                    <div id="question" class="question-card">
+                        <p>正在加载题库...</p>
+                    </div>
+
+                    <div id="options" class="options-group"></div>
+
+                    <div class="action-bar">
+                        <button id="prev-btn" class="btn btn-secondary">上一题</button>
+                        <button id="mark-btn" class="btn btn-secondary">标记</button>
+                        <button id="submit" class="btn btn-primary">提交答案</button>
+                        <button id="next-btn" class="btn btn-success">下一题</button>
+                    </div>
+
+                    <div id="feedback" class="feedback-area">
+                        <div id="result"></div>
+                        <div id="explanation"></div>
+                        <div id="stats"></div>
+
+                        <div id="note-area" style="display: none;">
+                            <h4>学习笔记：</h4>
+                            <textarea id="note-text" placeholder="在这里输入你的笔记..."></textarea>
+                            <button id="save-note" class="btn btn-secondary">保存笔记</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="profile-view" style="display: none;">
+                    <div class="profile-header">
+                        <h2>个人信息</h2>
+                        <button id="back-to-quiz" class="btn btn-secondary">返回刷题</button>
+                    </div>
+
+                    <div class="profile-stats" id="profile-summary"></div>
+
+                    <div class="profile-section">
+                        <h3>已做的题</h3>
+                        <div class="profile-type">
+                            <div class="profile-type-title">判断题</div>
+                            <div class="nav-grid" id="profile-done-judge"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">单选题</div>
+                            <div class="nav-grid" id="profile-done-single"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">多选题</div>
+                            <div class="nav-grid" id="profile-done-multi"></div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3>错题</h3>
+                        <div class="profile-type">
+                            <div class="profile-type-title">判断题</div>
+                            <div class="nav-grid" id="profile-wrong-judge"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">单选题</div>
+                            <div class="nav-grid" id="profile-wrong-single"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">多选题</div>
+                            <div class="nav-grid" id="profile-wrong-multi"></div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3>标记的题</h3>
+                        <div class="profile-type">
+                            <div class="profile-type-title">判断题</div>
+                            <div class="nav-grid" id="profile-marked-judge"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">单选题</div>
+                            <div class="nav-grid" id="profile-marked-single"></div>
+                        </div>
+                        <div class="profile-type">
+                            <div class="profile-type-title">多选题</div>
+                            <div class="nav-grid" id="profile-marked-multi"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </main>
     </div>
 

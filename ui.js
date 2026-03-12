@@ -11,13 +11,42 @@ export const ui = {
             question: document.getElementById('question'),
             options: document.getElementById('options'),
             submit: document.getElementById('submit'),
+            prevBtn: document.getElementById('prev-btn'),
+            markBtn: document.getElementById('mark-btn'),
             result: document.getElementById('result'),
             explanation: document.getElementById('explanation'),
             stats: document.getElementById('stats'),
             noteArea: document.getElementById('note-area'),
             noteText: document.getElementById('note-text'),
             saveNote: document.getElementById('save-note'),
-            nextBtn: document.getElementById('next-btn')
+            nextBtn: document.getElementById('next-btn'),
+            profileLink: document.getElementById('profile-link'),
+            backToQuiz: document.getElementById('back-to-quiz'),
+            quizView: document.getElementById('quiz-view'),
+            profileView: document.getElementById('profile-view'),
+            nav: {
+                judge: document.getElementById('nav-judge'),
+                single: document.getElementById('nav-single'),
+                multi: document.getElementById('nav-multi')
+            },
+            profile: {
+                summary: document.getElementById('profile-summary'),
+                done: {
+                    judge: document.getElementById('profile-done-judge'),
+                    single: document.getElementById('profile-done-single'),
+                    multi: document.getElementById('profile-done-multi')
+                },
+                wrong: {
+                    judge: document.getElementById('profile-wrong-judge'),
+                    single: document.getElementById('profile-wrong-single'),
+                    multi: document.getElementById('profile-wrong-multi')
+                },
+                marked: {
+                    judge: document.getElementById('profile-marked-judge'),
+                    single: document.getElementById('profile-marked-single'),
+                    multi: document.getElementById('profile-marked-multi')
+                }
+            }
         };
     },
 
@@ -27,8 +56,8 @@ export const ui = {
      * @param {number} index 
      * @param {number} total 
      */
-    renderQuestion(question, index, total) {
-        const { question: qDiv, options: oDiv, submit, result, explanation, stats, noteArea, nextBtn } = this.getContainer();
+    renderQuestion(question, index, total, { marked } = {}) {
+        const { question: qDiv, options: oDiv, submit, result, explanation, stats, noteArea, markBtn } = this.getContainer();
         
         // 重置 UI
         qDiv.innerHTML = `<h3>[${this.getTypeLabel(question.type)}] ${index + 1}/${total}</h3><p>${question.question}</p>`;
@@ -38,7 +67,7 @@ export const ui = {
         stats.innerHTML = '';
         noteArea.style.display = 'none';
         submit.style.display = 'block';
-        nextBtn.style.display = 'none';
+        markBtn.textContent = marked ? '取消标记' : '标记';
 
         // 渲染选项
         question.options.forEach((opt, i) => {
@@ -87,10 +116,9 @@ export const ui = {
      * @param {Object} stat {correct, wrong, note}
      */
     renderResult(isCorrect, question, stat) {
-        const { submit, result, explanation, stats, noteArea, noteText, nextBtn } = this.getContainer();
+        const { submit, result, explanation, stats, noteArea, noteText } = this.getContainer();
         
         submit.style.display = 'none';
-        nextBtn.style.display = 'block';
 
         result.innerHTML = isCorrect 
             ? '<span style="color: green; font-weight: bold;">回答正确！</span>' 
@@ -102,5 +130,122 @@ export const ui = {
         
         noteArea.style.display = 'block';
         noteText.value = stat.note || '';
+    },
+
+    setView(view) {
+        const { quizView, profileView } = this.getContainer();
+        if (view === 'profile') {
+            quizView.style.display = 'none';
+            profileView.style.display = 'block';
+            return;
+        }
+        quizView.style.display = 'block';
+        profileView.style.display = 'none';
+    },
+
+    renderQuestionNavigation(questions, currentIndex, records) {
+        const { nav } = this.getContainer();
+        nav.judge.innerHTML = '';
+        nav.single.innerHTML = '';
+        nav.multi.innerHTML = '';
+
+        questions.forEach((q, index) => {
+            const qid = `${q.type}_${q.id}`;
+            const record = records[qid] || { correct: 0, wrong: 0, note: '', marked: false };
+            const done = (record.correct || 0) + (record.wrong || 0) > 0;
+            const wrong = (record.wrong || 0) > 0;
+            const marked = !!record.marked;
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'nav-box';
+            btn.textContent = String(q.id);
+            btn.dataset.index = String(index);
+            btn.dataset.qid = qid;
+
+            if (index === currentIndex) btn.classList.add('is-current');
+            if (done) btn.classList.add('is-done');
+            if (wrong) btn.classList.add('is-wrong');
+            if (marked) btn.classList.add('is-marked');
+
+            if (q.type === 'judge') nav.judge.appendChild(btn);
+            if (q.type === 'single') nav.single.appendChild(btn);
+            if (q.type === 'multi') nav.multi.appendChild(btn);
+        });
+    },
+
+    renderProfile(allQuestions, records) {
+        const { profile } = this.getContainer();
+
+        const questionByQid = new Map(allQuestions.map(q => [`${q.type}_${q.id}`, q]));
+
+        const done = [];
+        const wrong = [];
+        const marked = [];
+
+        Object.entries(records).forEach(([qid, stat]) => {
+            const q = questionByQid.get(qid);
+            if (!q) return;
+            const correct = Number.isFinite(stat.correct) ? stat.correct : 0;
+            const wrongCount = Number.isFinite(stat.wrong) ? stat.wrong : 0;
+            const isDone = correct + wrongCount > 0;
+            const isWrong = wrongCount > 0;
+            const isMarked = !!stat.marked;
+
+            if (isDone) done.push(q);
+            if (isWrong) wrong.push(q);
+            if (isMarked) marked.push(q);
+        });
+
+        const sortFn = (a, b) => {
+            if (a.type !== b.type) return a.type.localeCompare(b.type);
+            return String(a.id).localeCompare(String(b.id), undefined, { numeric: true });
+        };
+
+        done.sort(sortFn);
+        wrong.sort(sortFn);
+        marked.sort(sortFn);
+
+        const total = allQuestions.length;
+        profile.summary.innerHTML = `<div>总题数：${total}，已做：${done.length}，错题：${wrong.length}，标记：${marked.length}</div>`;
+
+        const fillGrid = (container, items) => {
+            container.innerHTML = '';
+            items.forEach(q => {
+                const qid = `${q.type}_${q.id}`;
+                const stat = records[qid] || {};
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'nav-box';
+                btn.textContent = String(q.id);
+                btn.dataset.qid = qid;
+                if ((stat.correct || 0) + (stat.wrong || 0) > 0) btn.classList.add('is-done');
+                if ((stat.wrong || 0) > 0) btn.classList.add('is-wrong');
+                if (stat.marked) btn.classList.add('is-marked');
+                container.appendChild(btn);
+            });
+        };
+
+        const groupByType = (items) => {
+            const g = { judge: [], single: [], multi: [] };
+            items.forEach(q => g[q.type]?.push(q));
+            return g;
+        };
+
+        const doneGroup = groupByType(done);
+        const wrongGroup = groupByType(wrong);
+        const markedGroup = groupByType(marked);
+
+        fillGrid(profile.done.judge, doneGroup.judge);
+        fillGrid(profile.done.single, doneGroup.single);
+        fillGrid(profile.done.multi, doneGroup.multi);
+
+        fillGrid(profile.wrong.judge, wrongGroup.judge);
+        fillGrid(profile.wrong.single, wrongGroup.single);
+        fillGrid(profile.wrong.multi, wrongGroup.multi);
+
+        fillGrid(profile.marked.judge, markedGroup.judge);
+        fillGrid(profile.marked.single, markedGroup.single);
+        fillGrid(profile.marked.multi, markedGroup.multi);
     }
 };
