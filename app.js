@@ -92,6 +92,23 @@ class QuizApp {
         document.getElementById('question-nav').addEventListener('click', (e) => {
             const target = e.target;
             if (!(target instanceof HTMLElement)) return;
+            if (target.classList.contains('nav-more')) {
+                const type = target.dataset.type;
+                if (type) {
+                    ui.increaseNavLimit(type, 200);
+                    ui.renderQuestionNavigation(this.currentQuestions, this.currentIndex, storage.getUserInfoSnapshot().progress.questions);
+                }
+                return;
+            }
+            const title = target.closest('.nav-title');
+            if (title) {
+                const grid = title.nextElementSibling;
+                if (grid && grid.id && grid.id.startsWith('nav-')) {
+                    const type = grid.id.replace('nav-', '');
+                    ui.setNavExpanded(type);
+                }
+                return;
+            }
             if (!target.classList.contains('nav-box')) return;
             const indexStr = target.dataset.index;
             if (!indexStr) return;
@@ -154,6 +171,7 @@ class QuizApp {
             });
         }
 
+        ui.resetNavLimits();
         this.currentIndex = 0;
         if (this.currentQuestions.length === 0) {
             alert('没有符合筛选条件的题目！');
@@ -179,6 +197,7 @@ class QuizApp {
         const stat = storage.getQuestionStat(qid);
         ui.renderQuestion(question, this.currentIndex, this.currentQuestions.length, { marked: stat.marked });
         ui.renderQuestionNavigation(this.currentQuestions, this.currentIndex, storage.getUserInfoSnapshot().progress.questions);
+        ui.setNavExpanded(question.type);
         storage.setLastQid(qid);
         window.scrollTo({ top: 0, behavior: "smooth" });
     }

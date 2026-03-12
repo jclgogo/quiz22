@@ -3,6 +3,37 @@
  */
 
 export const ui = {
+    navLimits: { judge: 200, single: 200, multi: 200 },
+    navExpandedType: 'judge',
+    setNavExpanded(type) {
+        if (type !== 'judge' && type !== 'single' && type !== 'multi') return;
+        this.navExpandedType = type;
+        this.applyNavExpanded();
+    },
+    applyNavExpanded() {
+        const { nav } = this.getContainer();
+        const grids = {
+            judge: nav.judge,
+            single: nav.single,
+            multi: nav.multi
+        };
+        Object.entries(grids).forEach(([type, el]) => {
+            if (!el) return;
+            if (type === this.navExpandedType) {
+                el.classList.remove('collapsed');
+            } else {
+                el.classList.add('collapsed');
+            }
+        });
+    },
+    resetNavLimits() {
+        this.navLimits = { judge: 200, single: 200, multi: 200 };
+    },
+    increaseNavLimit(type, delta = 200) {
+        if (!this.navLimits[type]) this.navLimits[type] = 0;
+        this.navLimits[type] += delta;
+        if (this.navLimits[type] > 10000) this.navLimits[type] = 10000;
+    },
     /**
      * 获取题目容器
      */
@@ -149,29 +180,61 @@ export const ui = {
         nav.single.innerHTML = '';
         nav.multi.innerHTML = '';
 
-        questions.forEach((q, index) => {
-            const qid = `${q.type}_${q.id}`;
-            const record = records[qid] || { correct: 0, wrong: 0, note: '', marked: false };
-            const done = (record.correct || 0) + (record.wrong || 0) > 0;
-            const wrong = (record.wrong || 0) > 0;
-            const marked = !!record.marked;
-
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'nav-box';
-            btn.textContent = String(q.id);
-            btn.dataset.index = String(index);
-            btn.dataset.qid = qid;
-
-            if (index === currentIndex) btn.classList.add('is-current');
-            if (done) btn.classList.add('is-done');
-            if (wrong) btn.classList.add('is-wrong');
-            if (marked) btn.classList.add('is-marked');
-
-            if (q.type === 'judge') nav.judge.appendChild(btn);
-            if (q.type === 'single') nav.single.appendChild(btn);
-            if (q.type === 'multi') nav.multi.appendChild(btn);
+        const byType = { judge: [], single: [], multi: [] };
+        questions.forEach((q, idx) => {
+            byType[q.type]?.push({ q, idx });
         });
+
+        const current = questions[currentIndex];
+        if (current) {
+            const arr = byType[current.type];
+            const pos = arr.findIndex(item => item.idx === currentIndex);
+            if (pos >= 0 && this.navLimits[current.type] < pos + 1) {
+                this.navLimits[current.type] = pos + 1;
+            }
+        }
+
+        const renderType = (type, container) => {
+            const items = byType[type];
+            const limit = this.navLimits[type] || 200;
+            const slice = items.slice(0, limit);
+
+            slice.forEach(({ q, idx }) => {
+                const qid = `${q.type}_${q.id}`;
+                const record = records[qid] || { correct: 0, wrong: 0, note: '', marked: false };
+                const done = (record.correct || 0) + (record.wrong || 0) > 0;
+                const wrong = (record.wrong || 0) > 0;
+                const marked = !!record.marked;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'nav-box';
+                btn.textContent = String(q.id);
+                btn.dataset.index = String(idx);
+                btn.dataset.qid = qid;
+
+                if (idx === currentIndex) btn.classList.add('is-current');
+                if (done) btn.classList.add('is-done');
+                if (wrong) btn.classList.add('is-wrong');
+                if (marked) btn.classList.add('is-marked');
+
+                container.appendChild(btn);
+            });
+
+            if (items.length > limit) {
+                const more = document.createElement('button');
+                more.type = 'button';
+                more.className = 'nav-box nav-more';
+                more.textContent = `更多 (${items.length - limit})`;
+                more.dataset.type = type;
+                container.appendChild(more);
+            }
+        };
+
+        renderType('judge', nav.judge);
+        renderType('single', nav.single);
+        renderType('multi', nav.multi);
+        this.applyNavExpanded();
     },
 
     renderProfile(allQuestions, records) {
